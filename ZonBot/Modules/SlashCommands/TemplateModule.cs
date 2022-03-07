@@ -10,7 +10,7 @@ namespace ZonBot.Modules.SlashCommands
         [SlashCommand("template", "template", runMode: RunMode.Async)]
         public async Task TemplateAsync()
         {
-            await Task.Delay(0);
+            await DeferAsync(ephemeral: true);
         }
     }
 }

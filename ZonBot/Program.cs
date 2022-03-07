@@ -34,6 +34,7 @@ namespace ZonBot
 
             // Here we can initialize the service that will register and execute our commands
             await services.GetRequiredService<CommandHandler>().InitializeAsync();
+            await services.GetRequiredService<MessageReceivedHandler>().InitializeAsync();
 
             // Bot token can be provided from the Configuration object we set up earlier
             await _client.LoginAsync(TokenType.Bot, _config["token"]);
@@ -77,15 +78,15 @@ namespace ZonBot
             var client = new DiscordSocketClient(discordConfig);
             
             var sc = new ServiceCollection();
-            sc.AddSingleton(configuration);
+            sc.AddSingleton<IConfiguration>(configuration);
             sc.AddSingleton<DiscordSocketClient>(client);
-            sc.AddSingleton<InteractionService>(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
-            sc.AddSingleton<InteractiveService>(x => new InteractiveService(x.GetRequiredService<DiscordSocketClient>()));
-            sc.AddSingleton<CommandHandler>(services => new CommandHandler(
-                client: services.GetRequiredService<DiscordSocketClient>(), 
-                interactions: services.GetRequiredService<InteractionService>(), 
-                services: services,
-                interactive: services.GetRequiredService<InteractiveService>()));
+            sc.AddSingleton<InteractionService>(services => new InteractionService(services.GetRequiredService<DiscordSocketClient>()));
+            sc.AddSingleton<InteractiveService>(services => new InteractiveService(services.GetRequiredService<DiscordSocketClient>()));
+            sc.AddSingleton<CommandHandler>(services => new CommandHandler(client: services.GetRequiredService<DiscordSocketClient>(),
+                                                                                        interactions: services.GetRequiredService<InteractionService>(), 
+                                                                                        services: services,
+                                                                                        interactive: services.GetRequiredService<InteractiveService>()));
+            sc.AddSingleton<MessageReceivedHandler>(services => new MessageReceivedHandler(client: services.GetRequiredService<DiscordSocketClient>()));
             
             return sc.BuildServiceProvider();
         }

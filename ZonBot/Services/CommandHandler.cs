@@ -63,7 +63,11 @@ namespace ZonBot.Services
         {
             if (!result.IsSuccess)
             {
-                await ctx.Interaction.RespondAsync($"Command failed for the following reason:\n{result.ErrorReason}");
+                if (result.Error != InteractionCommandError.UnknownCommand)
+                {
+                    await ctx.Interaction.RespondAsync(
+                        $"Command failed for the following reason:\n{result.ErrorReason}");
+                }
 
                 switch (result.Error)
                 {
@@ -81,6 +85,10 @@ namespace ZonBot.Services
                         break;
                     case InteractionCommandError.Unsuccessful:
                         // implement
+                        break;
+                    case InteractionCommandError.ConvertFailed:
+                        break;
+                    case InteractionCommandError.ParseFailed:
                         break;
                 }
             }
@@ -109,7 +117,9 @@ namespace ZonBot.Services
                     case InteractionCommandError.Unsuccessful:
                         // implement
                         break;
-                    default:
+                    case InteractionCommandError.ConvertFailed:
+                        break;
+                    case InteractionCommandError.ParseFailed:
                         break;
                 }
             }
@@ -138,7 +148,9 @@ namespace ZonBot.Services
                     case InteractionCommandError.Unsuccessful:
                         // implement
                         break;
-                    default:
+                    case InteractionCommandError.ConvertFailed:
+                        break;
+                    case InteractionCommandError.ParseFailed:
                         break;
                 }
             }
