@@ -29,7 +29,7 @@ namespace ZonBot.Services
     // TO-DO: [Utility]charinfo
     // TO-DO: [QoL]Reminder(Kalendererinnerung)
     
-    public class CommandHandler
+    public class CommandHandler : IHandler
     {
         private readonly DiscordSocketClient _client;
         private readonly InteractionService _interactions;

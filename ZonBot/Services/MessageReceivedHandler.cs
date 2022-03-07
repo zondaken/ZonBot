@@ -2,7 +2,7 @@
 
 namespace ZonBot.Services
 {
-    public class MessageReceivedHandler
+    public class MessageReceivedHandler : IHandler
     {
         private readonly DiscordSocketClient _client;
 
@@ -11,9 +11,10 @@ namespace ZonBot.Services
             _client = client;
         }
 
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
             _client.MessageReceived += OnMessageReceived;
+            return Task.CompletedTask;
         }
 
         private async Task OnMessageReceived(SocketMessage arg)

@@ -32,10 +32,16 @@ namespace ZonBot
 
             _client.Ready += OnReady;
 
+            /*
             // Here we can initialize the service that will register and execute our commands
             await services.GetRequiredService<CommandHandler>().InitializeAsync();
-            await services.GetRequiredService<MessageReceivedHandler>().InitializeAsync();
+            await services.GetRequiredService<MessageReceivedHandler>().InitializeAsync();*/
 
+            foreach (var handler in services.GetServices<IHandler>())
+            {
+                await handler.InitializeAsync();
+            }
+            
             // Bot token can be provided from the Configuration object we set up earlier
             await _client.LoginAsync(TokenType.Bot, _config["token"]);
             await _client.StartAsync();
@@ -82,11 +88,11 @@ namespace ZonBot
             sc.AddSingleton<DiscordSocketClient>(client);
             sc.AddSingleton<InteractionService>(services => new InteractionService(services.GetRequiredService<DiscordSocketClient>()));
             sc.AddSingleton<InteractiveService>(services => new InteractiveService(services.GetRequiredService<DiscordSocketClient>()));
-            sc.AddSingleton<CommandHandler>(services => new CommandHandler(client: services.GetRequiredService<DiscordSocketClient>(),
+            sc.AddSingleton<IHandler, CommandHandler>(services => new CommandHandler(client: services.GetRequiredService<DiscordSocketClient>(),
                                                                                         interactions: services.GetRequiredService<InteractionService>(), 
                                                                                         services: services,
                                                                                         interactive: services.GetRequiredService<InteractiveService>()));
-            sc.AddSingleton<MessageReceivedHandler>(services => new MessageReceivedHandler(client: services.GetRequiredService<DiscordSocketClient>()));
+            sc.AddSingleton<IHandler, MessageReceivedHandler>(services => new MessageReceivedHandler(client: services.GetRequiredService<DiscordSocketClient>()));
             
             return sc.BuildServiceProvider();
         }
