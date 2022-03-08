@@ -20,7 +20,8 @@ namespace ZonBot
 
         private static async Task InitializeHandlers(IHost host)
         {
-            host.Services.GetRequiredService<InteractiveService>().Log += async message => Console.WriteLine(message.Message);
+            var interactive = host.Services.GetRequiredService<InteractiveService>();
+            interactive.Log += async message => Console.WriteLine(message.Message);
 
             foreach (var handler in host.Services.GetServices<IHandler>())
             {
