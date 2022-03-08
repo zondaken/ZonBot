@@ -14,19 +14,9 @@ namespace ZonBot
         public static async Task Main(string[] args)
         {
             var host = MakeHost();
+            
             await InitializeHandlers(host);
             await host.RunAsync();
-        }
-
-        private static async Task InitializeHandlers(IHost host)
-        {
-            var interactive = host.Services.GetRequiredService<InteractiveService>();
-            interactive.Log += async message => Console.WriteLine(message.Message);
-
-            foreach (var handler in host.Services.GetServices<IHandler>())
-            {
-                await handler.InitializeAsync();
-            }
         }
 
         private static IHost MakeHost()
@@ -42,12 +32,16 @@ namespace ZonBot
 
         private static void ConfigureDiscordHost(HostBuilderContext context, DiscordHostConfiguration config)
         {
+            GatewayIntents intents = GatewayIntents.AllUnprivileged
+                                        & ~GatewayIntents.GuildScheduledEvents // remove [GuildScheduledEvents] from base flag
+                                        & ~GatewayIntents.GuildInvites; // remove [GuildInvites] from base flag
+
             config.SocketConfig = new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
                 AlwaysDownloadUsers = true,
                 MessageCacheSize = 200,
-                GatewayIntents = GatewayIntents.AllUnprivileged
+                GatewayIntents = intents
             };
 
             config.Token = context.Configuration["token"];
@@ -67,5 +61,18 @@ namespace ZonBot
             services.AddSingleton<IHandler, CommandHandler>();
             services.AddSingleton<IHandler, MessageReceivedHandler>();
         }
+        
+        private static async Task InitializeHandlers(IHost host)
+        {
+            // [DiscordSocketClient] and [InteractionService] already get their log from [.ConfigureDiscordHost]
+            var interactive = host.Services.GetRequiredService<InteractiveService>();
+            interactive.Log += async message => Console.WriteLine(message.Message);
+
+            foreach (var handler in host.Services.GetServices<IHandler>())
+            {
+                await handler.InitializeAsync();
+            }
+        }
+
     }
 }
