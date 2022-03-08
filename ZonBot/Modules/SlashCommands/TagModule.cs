@@ -1,6 +1,7 @@
-﻿namespace ZonBot.Modules.SlashCommands;
-
-public class TagModule
+﻿namespace ZonBot.Modules.SlashCommands
 {
-    
+    public class TagModule
+    {
+
+    }
 }
