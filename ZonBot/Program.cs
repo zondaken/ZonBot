@@ -13,7 +13,7 @@ namespace ZonBot
     {
         public static async Task Main(string[] args)
         {
-            var host = MakeHost();
+            using var host = MakeHost();
             
             await InitializeHandlers(host);
             await host.RunAsync();
@@ -64,7 +64,7 @@ namespace ZonBot
         
         private static async Task InitializeHandlers(IHost host)
         {
-            // [DiscordSocketClient] and [InteractionService] already get their log from [.ConfigureDiscordHost]
+            // [DiscordSocketClient] and [InteractionService] already get their log from [.ConfigureDiscordHost] (?)
             var interactive = host.Services.GetRequiredService<InteractiveService>();
             interactive.Log += async message => Console.WriteLine(message.Message);
 
