@@ -39,21 +39,6 @@ namespace ZonBot
             return hostBuilder.Build();
         }
 
-        private static void ConfigureServices(HostBuilderContext _, IServiceCollection services)
-        {
-            // Add any other services here
-            services.AddSingleton<InteractionService>();
-            services.AddSingleton<InteractiveService>();
-            services.AddSingleton<IHandler, CommandHandler>();
-            services.AddSingleton<IHandler, MessageReceivedHandler>();
-        }
-
-        private static void ConfigureInteractionService(HostBuilderContext _, InteractionServiceConfig config)
-        {
-            config.LogLevel = LogSeverity.Info;
-            config.UseCompiledLambda = true;
-        }
-
         private static void ConfigureDiscordHost(HostBuilderContext context, DiscordHostConfiguration config)
         {
             config.SocketConfig = new DiscordSocketConfig
@@ -65,6 +50,21 @@ namespace ZonBot
             };
 
             config.Token = context.Configuration["token"];
+        }
+        
+        private static void ConfigureInteractionService(HostBuilderContext _, InteractionServiceConfig config)
+        {
+            config.LogLevel = LogSeverity.Info;
+            config.UseCompiledLambda = true;
+        }
+
+        private static void ConfigureServices(HostBuilderContext _, IServiceCollection services)
+        {
+            // Add any other services here
+            services.AddSingleton<InteractionService>();
+            services.AddSingleton<InteractiveService>();
+            services.AddSingleton<IHandler, CommandHandler>();
+            services.AddSingleton<IHandler, MessageReceivedHandler>();
         }
     }
 }
