@@ -69,6 +69,7 @@ namespace ZonBot.Modules.SlashCommands
 
             await RespondAsync("Response", components: builder.Build());
 
+            // TODO: update to InteractionUtility
         }
         
         [ComponentInteraction("AVeryUniqueNewAndBetterCustomId", ignoreGroupNames: true)]

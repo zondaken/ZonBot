@@ -11,15 +11,19 @@ namespace ZonBot
 {
     class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
+        {
+            new Program().MainAsync(args).GetAwaiter().GetResult();
+        }
+        
+        public async Task MainAsync(string[] args)
         {
             using var host = MakeHost();
-            
             await InitializeHandlers(host);
             await host.RunAsync();
         }
 
-        private static IHost MakeHost()
+        private IHost MakeHost()
         {
             var hostBuilder = Host.CreateDefaultBuilder();
             hostBuilder.UseContentRoot(Helpers.ConfigPath); // uses appsettings.json as well
@@ -30,7 +34,7 @@ namespace ZonBot
             return hostBuilder.Build();
         }
 
-        private static void ConfigureDiscordHost(HostBuilderContext context, DiscordHostConfiguration config)
+        private void ConfigureDiscordHost(HostBuilderContext context, DiscordHostConfiguration config)
         {
             GatewayIntents intents = GatewayIntents.AllUnprivileged
                                         & ~GatewayIntents.GuildScheduledEvents // remove [GuildScheduledEvents] from base flag
@@ -47,13 +51,13 @@ namespace ZonBot
             config.Token = context.Configuration["token"];
         }
         
-        private static void ConfigureInteractionService(HostBuilderContext _, InteractionServiceConfig config)
+        private void ConfigureInteractionService(HostBuilderContext _, InteractionServiceConfig config)
         {
             config.LogLevel = LogSeverity.Info;
             config.UseCompiledLambda = true;
         }
 
-        private static void ConfigureServices(HostBuilderContext _, IServiceCollection services)
+        private void ConfigureServices(HostBuilderContext _, IServiceCollection services)
         {
             // Add any other services here
             services.AddSingleton<InteractionService>();
@@ -62,7 +66,7 @@ namespace ZonBot
             services.AddSingleton<IHandler, MessageReceivedHandler>();
         }
         
-        private static async Task InitializeHandlers(IHost host)
+        private async Task InitializeHandlers(IHost host)
         {
             // [DiscordSocketClient] and [InteractionService] already get their log from [.ConfigureDiscordHost] (?)
             var interactive = host.Services.GetRequiredService<InteractiveService>();
