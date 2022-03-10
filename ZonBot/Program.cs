@@ -5,7 +5,9 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using ZonBot.Services;
 using Fergun.Interactive;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using ZonBot.TypeConverters;
 
 namespace ZonBot
 {
@@ -15,12 +17,18 @@ namespace ZonBot
         {
             new Program().MainAsync(args).GetAwaiter().GetResult();
         }
-        
-        public async Task MainAsync(string[] args)
+
+        private async Task MainAsync(string[] args)
         {
             using var host = MakeHost();
+            await InitializeConverters(host);
             await InitializeHandlers(host);
             await host.RunAsync();
+        }
+
+        private async Task InitializeConverters(IHost host)
+        {
+            host.Services.GetRequiredService<InteractionService>().AddTypeConverter<IEmote>(new EmoteConverter());
         }
 
         private IHost MakeHost()
@@ -57,11 +65,13 @@ namespace ZonBot
             config.UseCompiledLambda = true;
         }
 
-        private void ConfigureServices(HostBuilderContext _, IServiceCollection services)
+        private void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         {
             // Add any other services here
+            services.AddSingleton<IConfiguration>(context.Configuration);
             services.AddSingleton<InteractionService>();
             services.AddSingleton<InteractiveService>();
+            services.AddSingleton<IHandler, ReadyHandler>();
             services.AddSingleton<IHandler, CommandHandler>();
             services.AddSingleton<IHandler, MessageReceivedHandler>();
         }
