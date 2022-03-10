@@ -69,7 +69,16 @@ namespace ZonBot.Modules.SlashCommands
 
             await RespondAsync("Response", components: builder.Build());
 
-            // TODO: update to InteractionUtility
+
+            //await InteractionUtility.ConfirmAsync(Context.Client, Context.Channel, TimeSpan.FromMinutes(10));
+            //MentionUtils;
+
+            if (await InteractionUtility.WaitForMessageComponentAsync(Context.Client, await GetOriginalResponseAsync(),
+                    TimeSpan.FromMinutes(10)) is IComponentInteraction interaction)
+            {
+                await FollowupAsync(interaction.Data.CustomId);
+            }
+
         }
         
         [ComponentInteraction("AVeryUniqueNewAndBetterCustomId", ignoreGroupNames: true)]
